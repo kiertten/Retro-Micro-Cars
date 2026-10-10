@@ -167,19 +167,19 @@ TOTAL_LAPS = 3                # число кругов
 
 ### Стартовый экран
 
-![Стартовый экран](screenshots/menu.png)
+![Стартовый экран](py_retro_cars/screenshots/menu.png)
 
 ### Заезд по трассе
 
-![Заезд](screenshots/race.png)
+![Заезд](py_retro_cars/screenshots/race.png)
 
 ### Занос со следами протектора
 
-![Занос](screenshots/drift.png)
+![Занос](py_retro_cars/screenshots/drift.png)
 
 ### Экран финиша
 
-![Финиш](screenshots/finish.png)
+![Финиш](py_retro_cars/screenshots/finish.png)
 
 ---
 
