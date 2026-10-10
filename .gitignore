@@ -12,3 +12,8 @@ venv/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Runtime-generated files
+game_flight.log
+records.json
+*.tmp

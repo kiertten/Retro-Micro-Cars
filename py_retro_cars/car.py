@@ -15,7 +15,10 @@ from py_retro_cars.constants import (
     CAR_LENGTH,
     CAR_WIDTH,
     COLORS,
+    GRASS_GRIP_K,
+    GRASS_MAX_SPEED,
     GRIP_K,
+    MAX_SPEED,
     START_ANGLE,
     START_POSITION,
     WINDOW_HEIGHT,
@@ -35,6 +38,7 @@ class Car:
         self.vy = 0.0
         self.grip_k = GRIP_K        # коэффициент сцепления K
         self.drifting = False       # флаг заноса (для HUD и следов)
+        self.on_grass = False       # True, если центр машины на траве
         self.base_sprite = self._build_sprite()
 
     # ------------------------------------------------------------
@@ -86,7 +90,7 @@ class Car:
         Один шаг симуляции.
 
         keys  - объект, поддерживающий keys[pygame.K_x] (результат get_pressed)
-        track - Track (сейчас не используется; пригодится в ЛР 2 для покрытия)
+        track - Track: по нему определяется покрытие под машиной
         """
         throttle = keys[pygame.K_w] or keys[pygame.K_UP]
         brake = keys[pygame.K_s] or keys[pygame.K_DOWN]
@@ -94,8 +98,14 @@ class Car:
             1 if (keys[pygame.K_a] or keys[pygame.K_LEFT]) else 0
         )
 
+        # 0) покрытие под центром машины определяет K и предел скорости:
+        #    на траве оба параметра принудительно снижаются (ЛР 2).
+        self.on_grass = track.is_grass(self.x, self.y)
+        self.grip_k = GRASS_GRIP_K if self.on_grass else GRIP_K
+        max_speed = GRASS_MAX_SPEED if self.on_grass else MAX_SPEED
+
         # 1) скорость, 2) угол кузова, 3) вектор движения с учётом сцепления K
-        self.speed = physics.update_speed(self.speed, throttle, brake)
+        self.speed = physics.update_speed(self.speed, throttle, brake, max_speed)
         self.theta = physics.update_heading(self.theta, self.speed, steer)
         self.vx, self.vy = physics.update_velocity(self.vx, self.vy, self.theta, self.speed, self.grip_k)
 

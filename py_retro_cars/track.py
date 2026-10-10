@@ -1,7 +1,9 @@
 """
 Трасса: чтение символьной матрицы, определение покрытия и отрисовка.
 
-Трасса задана матрицей TRACK_LAYOUT из constants.py:
+Трасса - матрица строк. Обычно её передаёт data_io.load_track() (файл
+track.txt); по умолчанию используется DEFAULT_TRACK_LAYOUT из constants.py.
+Символы:
     '#' - асфальт, '.' - трава, 'F' - финишная линия.
 """
 
@@ -12,7 +14,7 @@ from py_retro_cars.constants import (
     GRID_COLUMNS,
     GRID_ROWS,
     TILE_SIZE,
-    TRACK_LAYOUT,
+    DEFAULT_TRACK_LAYOUT,
 )
 
 
@@ -20,7 +22,7 @@ class Track:
     """Хранит матрицу трассы и умеет отвечать «что находится в точке (x, y)»."""
 
     def __init__(self, layout=None):
-        self.layout = layout if layout is not None else TRACK_LAYOUT
+        self.layout = layout if layout is not None else DEFAULT_TRACK_LAYOUT
         # Прямоугольники финишных плиток - для детекта пересечения линии.
         self.finish_rects = [
             pygame.Rect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE)
@@ -42,6 +44,10 @@ class Track:
     def is_drivable(self, px, py):
         """True, если в точке асфальт или финиш (не трава)."""
         return self.tile_at(px, py) in ("#", "F")
+
+    def is_grass(self, px, py):
+        """True, если в точке трава (в том числе вне окна)."""
+        return self.tile_at(px, py) == "."
 
     def on_finish(self, px, py):
         """True, если точка лежит на финишной линии."""

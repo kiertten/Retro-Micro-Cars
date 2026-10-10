@@ -27,6 +27,7 @@ from py_retro_cars.constants import (
     MAX_REVERSE_SPEED,
     MAX_SPEED,
     MIN_STEER_SPEED,
+    OVERSPEED_DECEL,
     ROLLING_FRICTION,
     TURN_RATE,
 )
@@ -46,12 +47,13 @@ def normalize_angle(angle):
     return angle
 
 
-def update_speed(speed, throttle, brake):
+def update_speed(speed, throttle, brake, max_speed=MAX_SPEED):
     """
     Обновляет линейную скорость за один кадр.
 
     throttle - True, если нажата W (разгон)
     brake    - True, если нажата S (тормоз, а затем задний ход)
+    max_speed - предел скорости на текущем покрытии (на траве он ниже)
     """
     if throttle and not brake:
         speed += ACCELERATION
@@ -64,7 +66,10 @@ def update_speed(speed, throttle, brake):
             speed = max(0.0, speed - ROLLING_FRICTION)
         elif speed < 0:
             speed = min(0.0, speed + ROLLING_FRICTION)
-    # Ограничение максимальной скорости (требование критериев варианта).
+    # Ограничение максимальной скорости. Если машина заехала на траву на
+    # большой скорости, превышение предела гасится быстро, но не мгновенно.
+    if speed > max_speed:
+        speed = max(max_speed, speed - OVERSPEED_DECEL)
     return clamp(speed, MAX_REVERSE_SPEED, MAX_SPEED)
 
 
