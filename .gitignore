@@ -17,3 +17,6 @@ Thumbs.db
 game_flight.log
 records.json
 *.tmp
+py_bot/data/
+.env.*
+!.env.example

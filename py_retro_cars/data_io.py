@@ -169,7 +169,7 @@ def load_records(path=RECORDS_FILE):
     return sorted(records, key=lambda r: r["best_lap"])
 
 
-def save_record(name, best_lap_sec, total_sec, path=RECORDS_FILE):
+def save_record(name, best_lap_sec, total_sec, path=RECORDS_FILE, *, sectors=None, track_id=None):
     """
     Добавляет результат заезда в таблицу рекордов и сохраняет файл в JSON.
 
@@ -182,8 +182,11 @@ def save_record(name, best_lap_sec, total_sec, path=RECORDS_FILE):
     records.append(
         {
             "name": name,
-            "best_lap": round(best_lap_sec, 2),
-            "total_time": round(total_sec, 2),
+            "best_lap": round(best_lap_sec, 3),
+            "total_time": round(total_sec, 3),
+            "sectors": sectors,
+            "sector_version": 2 if sectors else None,
+            **({"track_id": track_id} if track_id else {}),
             "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
     )

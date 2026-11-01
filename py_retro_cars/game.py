@@ -13,6 +13,7 @@
 """
 
 import sys
+import hashlib
 
 import pygame
 
@@ -33,6 +34,7 @@ from py_retro_cars.constants import (
 from py_retro_cars.data_io import logger
 from py_retro_cars.skid_marks import SkidMarks
 from py_retro_cars.track import Track
+from py_retro_cars.timing import reference_route
 from py_retro_cars.ui import draw_game_over, draw_hud, draw_menu, draw_name_input
 
 # Проезд ниже этой линии (пиксели по Y) засчитывается как контрольная точка круга.
@@ -48,6 +50,12 @@ class Game:
     def __init__(self, track_path=data_io.TRACK_FILE, records_path=data_io.RECORDS_FILE):
         # Трасса читается из track.txt; при проблемах - запасная (см. data_io).
         self.track = Track(data_io.load_track(track_path))
+        self.track_id = hashlib.sha256("\n".join(self.track.layout).encode("utf-8")).hexdigest()
+        try:
+            self.sector_route = reference_route(self.track.layout)
+        except ValueError:
+            self.sector_route = []
+            logger.warning("Для этой формы трассы секторные ворота не определены")
         self.records_path = records_path
         self.records = data_io.load_records(records_path)
         self.skids = SkidMarks()
@@ -62,6 +70,11 @@ class Game:
         self.lap_frames = 0          # время текущего круга (в кадрах)
         self.total_frames = 0        # общее время заезда
         self.best_lap_frames = 0     # лучший круг (0 - ещё нет)
+        self.timing_started = False
+        self.sector_crossings = []
+        self.best_lap_sectors = None
+        self._sector_previous_position = (self.car.x,self.car.y)
+        self._sector_previous_frame = 0
         self.checkpoint_passed = False
         self.was_on_finish = False
         self.name_input = ""         # вводимое имя игрока
@@ -103,7 +116,8 @@ class Game:
         """Записывает результат в records.json и переходит на экран итогов."""
         name = self.name_input.strip() or DEFAULT_PLAYER_NAME
         saved = data_io.save_record(
-            name, self.best_lap_frames / FPS, self.total_frames / FPS, self.records_path
+            name, self.best_lap_frames / FPS, self.total_frames / FPS, self.records_path,
+            sectors=self.best_lap_sectors, track_id=self.track_id
         )
         self.saved_ok = saved is not None
         if saved is not None:
@@ -116,8 +130,9 @@ class Game:
             return
 
         self.car.update(keys, self.track)
-        self.lap_frames += 1
-        self.total_frames += 1
+        if self.timing_started:
+            self.lap_frames += 1
+            self.total_frames += 1
 
         # Следы протектора - только при заносе на асфальте.
         if self.car.drifting and not self.car.on_grass:
@@ -148,6 +163,27 @@ class Game:
 
     def _check_laps(self):
         """Считает круги: контрольная точка внизу + пересечение финиша вправо."""
+        # Две горизонтальные границы на середине высоты дорожного кольца:
+        # справа пересечение сверху вниз, слева — снизу вверх. Покрытие
+        # не влияет на замер: игра разрешает ехать по траве.
+        position = (self.car.x, self.car.y)
+        if self.sector_route and self.timing_started and len(self.sector_crossings) < 2:
+            center_x = (min(p[0] for p in self.sector_route)+max(p[0] for p in self.sector_route)+1)*20
+            center_y = (min(p[1] for p in self.sector_route)+max(p[1] for p in self.sector_route)+1)*20
+            x0,y0 = self._sector_previous_position
+            x1,y1 = position
+            expected = len(self.sector_crossings)
+            forward = (y0 < center_y <= y1) if expected == 0 else (y0 > center_y >= y1)
+            if forward:
+                fraction = (center_y-y0)/(y1-y0)
+                crossing_x = x0+fraction*(x1-x0)
+                correct_side = crossing_x >= center_x if expected == 0 else crossing_x < center_x
+                if correct_side:
+                    frames = self._sector_previous_frame+fraction*(self.lap_frames-self._sector_previous_frame)
+                    self.sector_crossings.append(frames)
+                    logger.info("Сектор S%s: отметка %.3f с",len(self.sector_crossings),frames/FPS)
+        self._sector_previous_position = position
+        self._sector_previous_frame = self.lap_frames
         if self.car.y > CHECKPOINT_Y:
             self.checkpoint_passed = True
 
@@ -155,12 +191,30 @@ class Game:
         crossed = on_finish and not self.was_on_finish
         self.was_on_finish = on_finish
 
+        if crossed and self.car.vx > 0 and not self.timing_started:
+            self.timing_started = True
+            self.lap_frames = self.total_frames = 0
+            self._sector_previous_frame = 0
+            self.checkpoint_passed = False
+            self.sector_crossings = []
+            logger.info("Хронометраж начат на финишной линии")
+            return
+
         if crossed and self.checkpoint_passed and self.car.vx > 0:
             self.lap += 1
             logger.info("Круг %d завершён за %.2f с", self.lap, self.lap_frames / FPS)
             if self.best_lap_frames == 0 or self.lap_frames < self.best_lap_frames:
                 self.best_lap_frames = self.lap_frames
+                if len(self.sector_crossings)==2:
+                    a,b = self.sector_crossings
+                    self.best_lap_sectors = [round(v/FPS,3) for v in (a,b-a,self.lap_frames-b)]
+                    if not all(v>0 for v in self.best_lap_sectors):
+                        self.best_lap_sectors = None
+                else:
+                    self.best_lap_sectors = None
             self.lap_frames = 0
+            self._sector_previous_frame = 0
+            self.sector_crossings = []
             self.checkpoint_passed = False
             if self.lap >= TOTAL_LAPS:
                 logger.info("Финиш: общее время %.2f с, лучший круг %.2f с",
@@ -190,7 +244,7 @@ def main():
     pygame.init()
     pygame.font.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption("Retro Micro Cars - ЛР 2")
+    pygame.display.set_caption("Retro Micro Cars - ЛР 1–3")
     clock = pygame.time.Clock()
     fonts = {
         "tiny": pygame.font.Font(None, 20),

@@ -1,0 +1,44 @@
+{
+  "records": [
+    {
+      "name": "Анна",
+      "best_lap": 30.0,
+      "total_time": 94.0,
+      "sectors": [
+        9.0,
+        10.0,
+        11.0
+      ],
+      "date": "2026-11-01 20:00:00",
+      "sector_version": 2
+    },
+    {
+      "name": "Анна",
+      "best_lap": -1,
+      "total_time": 94.0,
+      "sectors": [
+        9.0,
+        10.0,
+        11.0
+      ],
+      "date": "2026-11-01 20:00:00",
+      "sector_version": 2
+    },
+    {
+      "name": "Анна",
+      "best_lap": 30.0,
+      "total_time": 94.0,
+      "sectors": [
+        1,
+        2,
+        3
+      ],
+      "date": "2026-11-01 20:00:00",
+      "sector_version": 2
+    },
+    {
+      "name": "Ошибка",
+      "best_lap": true
+    }
+  ]
+}
