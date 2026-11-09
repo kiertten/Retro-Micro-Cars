@@ -1,0 +1,7 @@
+{
+  "name": "retro-micro-cars-lr4",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node selftest.js" }
+}
