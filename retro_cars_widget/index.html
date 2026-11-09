@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retro Micro Cars · Дрифт-заезд</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script type="module" src="./js/widget.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow"><span class="flag" aria-hidden="true"></span> RETRO CIRCUIT / 01</p>
+        <h1>Retro Micro Cars</h1>
+        <p class="subtitle">Кольцевой заезд с инерционным дрифтом</p>
+      </div>
+      <span class="badge">ЛР 5 · Вариант 21</span>
+    </header>
+
+    <div class="cockpit">
+      <section class="circuit" aria-label="Трасса">
+        <div class="track-header"><strong>Кольцевая трасса</strong><span>3 круга · по часовой стрелке</span></div>
+        <canvas id="track" width="800" height="600" aria-label="Гоночная трасса и автомобиль">
+          Для игры нужен браузер с поддержкой Canvas.
+        </canvas>
+        <div class="track-footer">
+          <span><i class="sample asphalt"></i> Асфальт</span>
+          <span><i class="sample grass"></i> Трава</span>
+          <span><i class="sample flag"></i> Финиш</span>
+        </div>
+      </section>
+
+      <aside class="panel" aria-label="Панель заезда">
+        <section class="telemetry">
+          <p class="eyebrow">ТЕЛЕМЕТРИЯ</p>
+          <h2 id="race-status" aria-live="polite">Загрузка трассы…</h2>
+          <p id="race-hint" class="hint">Подготовка заезда</p>
+          <dl class="gauges">
+            <div><dt>Круг</dt><dd id="lap">—</dd></div>
+            <div><dt>Скорость <small>пкс/с</small></dt><dd id="speed">0</dd></div>
+            <div><dt>Время <small>с</small></dt><dd id="time">0,00</dd></div>
+            <div><dt>Лучший круг <small>с</small></dt><dd id="best">—</dd></div>
+            <div><dt>Угол заноса</dt><dd id="slip">0°</dd></div>
+            <div><dt>Покрытие</dt><dd id="surface">Асфальт</dd></div>
+          </dl>
+        </section>
+
+        <section class="actions" aria-label="Сценарии">
+          <button class="primary" data-scenario="start" disabled>Начать заезд</button>
+          <div class="button-row">
+            <button data-scenario="pause" disabled>Пауза</button>
+            <button data-scenario="restart" disabled>Заново</button>
+          </div>
+          <button data-scenario="toggleVisibility" aria-pressed="false" disabled>Ограничить обзор</button>
+          <button data-scenario="clearSkidMarks" disabled>Очистить следы</button>
+        </section>
+
+        <section class="controls" aria-label="Управление">
+          <p><kbd>W</kbd><kbd>S</kbd><kbd>A</kbd><kbd>D</kbd> или стрелки</p>
+          <p><kbd>P</kbd> пауза <span>·</span> <kbd>R</kbd> заново</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
