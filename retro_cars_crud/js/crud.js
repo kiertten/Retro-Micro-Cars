@@ -1,5 +1,16 @@
 import { MAX_CHECKPOINTS, MAX_LENGTH, STORAGE_KEY, loadTracks, saveTracks, validateTrack } from './tracks.js';
 
+const inHub = new URLSearchParams(window.location.search).has('hub');
+const gamePage = inHub ? '../micro_racing_hub/index.html' : '../retro_cars_widget/index.html';
+
+if (inHub) {
+  document.body.classList.add('hub-catalog');
+  document.title = 'Micro Racing Hub · Каталог трасс';
+  document.querySelector('.hub-header').hidden = false;
+  document.querySelector('.hub-footer').hidden = false;
+  document.getElementById('standard-game').href = gamePage;
+}
+
 const createForm = document.getElementById('create-track');
 const editForm = document.getElementById('edit-track');
 const tbody = document.querySelector('#tracks tbody');
@@ -42,7 +53,7 @@ function formTrack(form) {
 function readRow(track) {
   const row = document.createElement('tr');
   row.dataset.id = track.id;
-  const playUrl = '../retro_cars_widget/index.html?' + new URLSearchParams({ track: track.id });
+  const playUrl = gamePage + '?' + new URLSearchParams({ track: track.id });
   row.innerHTML = `
     <td><strong>${escapeHtml(track.name)}</strong></td>
     <td>${numberFormat.format(track.length)}</td>

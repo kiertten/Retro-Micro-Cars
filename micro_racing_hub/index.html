@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Кольцевые заезды с инерционным дрифтом и каталогом трасс.">
+  <title>Micro Racing Hub · Заезд</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <script type="module" src="./js/navigation.js"></script>
+  <script type="module" src="./js/site.js"></script>
+</head>
+<body class="hub-game">
+  <header class="hub-header">
+    <a class="hub-brand" href="./index.html"><span class="hub-flag" aria-hidden="true"></span>Micro Racing Hub</a>
+    <button class="hub-menu-toggle" type="button" aria-expanded="false" aria-controls="hub-nav">☰ <span>Меню</span></button>
+    <nav class="hub-nav" id="hub-nav" aria-label="Основная навигация">
+      <a href="./index.html" aria-current="page">Заезд</a>
+      <a href="../retro_cars_crud/index.html?hub">Каталог трасс</a>
+    </nav>
+  </header>
+
+  <main class="hub-main">
+    <div class="race-layout">
+      <section class="circuit" aria-labelledby="track-name">
+        <header class="circuit-header">
+          <div>
+            <p class="tag">01 / ГОНОЧНЫЙ КОНТУР</p>
+            <h1 id="track-name">Кольцевая трасса</h1>
+          </div>
+          <span id="track-details">3 круга</span>
+        </header>
+        <div class="canvas-frame">
+          <canvas id="track" width="800" height="600" aria-label="Вид на трассу и автомобиль сверху">
+            Для заезда нужен браузер с поддержкой Canvas.
+          </canvas>
+        </div>
+      </section>
+
+      <aside class="telemetry" id="telemetry" aria-labelledby="telemetry-title">
+        <header class="telemetry-header">
+          <h2 id="telemetry-title" class="tag">02 / ТЕЛЕМЕТРИЯ</h2>
+          <p id="race-status" role="status">Загрузка</p>
+        </header>
+        <div class="instruments">
+          <div class="dial" aria-label="Спидометр">
+            <div class="dial-scale" aria-hidden="true">
+              <span>0</span><span>210</span><span>420</span>
+            </div>
+            <div class="needle" id="speed-needle" aria-hidden="true"></div>
+            <div class="dial-reading"><strong id="speed-value">0</strong><span>пкс/с</span></div>
+          </div>
+          <dl class="readouts">
+            <div class="lap-readout"><dt>Круг</dt><dd id="lap">1 / 3</dd></div>
+            <div class="drift-readout"><dt>Режим <span id="slip">0°</span></dt><dd id="drift">Сцепление</dd></div>
+            <div class="timing-readout"><dt>Время, с</dt><dd id="time">0,00</dd></div>
+            <div class="timing-readout"><dt>Лучший, с</dt><dd id="best">—</dd></div>
+          </dl>
+        </div>
+        <p id="race-hint" class="race-hint">Подготовка заезда…</p>
+        <div class="race-actions" aria-label="Управление заездом">
+          <button id="start" type="button" class="hub-button primary" data-scenario="start" disabled>Старт</button>
+          <button id="pause" type="button" class="hub-button" data-scenario="pause" disabled>Пауза</button>
+          <button type="button" class="hub-button" data-scenario="restart" disabled>Заново</button>
+        </div>
+        <div class="touch-controls" id="touch-controls" aria-label="Сенсорное управление">
+          <div class="joystick" role="group" aria-label="Джойстик, тяните влево или вправо">
+            <span aria-hidden="true">‹</span><span class="joystick-knob" aria-hidden="true"></span><span aria-hidden="true">›</span>
+          </div>
+          <button class="pedal" type="button" data-pedal="brake">Тормоз</button>
+          <button class="pedal gas" type="button" data-pedal="throttle">Газ</button>
+        </div>
+        <p class="key-guide"><kbd>W A S D</kbd> / стрелки <span>·</span> <kbd>P</kbd> пауза <span>·</span> <kbd>R</kbd> заново</p>
+      </aside>
+    </div>
+
+    <section class="track-picker" aria-labelledby="picker-title">
+      <header class="picker-header">
+        <div>
+          <h2 id="picker-title" class="tag">03 / ВЫБОР ТРАССЫ</h2>
+          <p id="track-notice" role="status"></p>
+        </div>
+        <a href="../retro_cars_crud/index.html?hub">К каталогу <span aria-hidden="true">↗</span></a>
+      </header>
+      <div id="track-list" class="track-list"></div>
+    </section>
+  </main>
+  <footer class="hub-footer"><span>RETRO MICRO CARS</span><span>Инерционный дрифт · Вариант 21</span></footer>
+</body>
+</html>

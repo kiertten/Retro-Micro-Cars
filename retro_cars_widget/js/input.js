@@ -1,12 +1,15 @@
 const ACTION_KEYS = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 const SCENARIO_KEYS = { KeyP: 'pause', KeyR: 'restart' };
 
-export function createInput(scenarios) {
+export function createInput(scenarios, touch) {
   const pressed = Object.create(null);
-  const clear = () => ACTION_KEYS.forEach((key) => { pressed[key] = false; });
+  const clear = () => {
+    ACTION_KEYS.forEach((key) => { pressed[key] = false; });
+    touch?.clear();
+  };
 
   window.addEventListener('keydown', (event) => {
-    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (event.defaultPrevented || event.ctrlKey || event.altKey || event.metaKey) return;
     if (ACTION_KEYS.includes(event.code)) {
       event.preventDefault();
       pressed[event.code] = true;
@@ -24,11 +27,12 @@ export function createInput(scenarios) {
   return {
     clear,
     read() {
+      const steer = Number(Boolean(pressed.KeyD || pressed.ArrowRight))
+        - Number(Boolean(pressed.KeyA || pressed.ArrowLeft));
       return {
-        throttle: Boolean(pressed.KeyW || pressed.ArrowUp),
-        brake: Boolean(pressed.KeyS || pressed.ArrowDown),
-        steer: Number(Boolean(pressed.KeyD || pressed.ArrowRight))
-          - Number(Boolean(pressed.KeyA || pressed.ArrowLeft)),
+        throttle: Boolean(pressed.KeyW || pressed.ArrowUp || touch?.throttle),
+        brake: Boolean(pressed.KeyS || pressed.ArrowDown || touch?.brake),
+        steer: steer || touch?.steer || 0,
       };
     },
   };

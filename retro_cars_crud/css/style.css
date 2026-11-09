@@ -73,3 +73,20 @@ td code { color: #c5d3de; font-size: 12px; }
   .form-grid, .filters { grid-template-columns: 1fr 1fr; }
   .form-grid .field:first-child, .filters .field:first-child { grid-column: 1 / -1; }
 }
+
+.hub-header[hidden], .hub-footer[hidden] { display: none; }
+
+.hub-catalog {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  color: var(--hub-text);
+  background: var(--hub-bg);
+  --panel: var(--hub-panel);
+  --field: var(--hub-field);
+  --line: var(--hub-line);
+  --muted: var(--hub-muted);
+  --accent: var(--hub-accent);
+}
+
+.hub-catalog .shell { min-width: 0; }

@@ -5,10 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Каталог трасс · Retro Micro Cars</title>
   <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../micro_racing_hub/css/theme.css">
   <link rel="stylesheet" href="./css/style.css">
+  <script type="module" src="../micro_racing_hub/js/navigation.js"></script>
   <script type="module" src="./js/crud.js"></script>
 </head>
 <body>
+  <header class="hub-header" hidden>
+    <a class="hub-brand" href="../micro_racing_hub/index.html"><span class="hub-flag" aria-hidden="true"></span>Micro Racing Hub</a>
+    <button class="hub-menu-toggle" type="button" aria-expanded="false" aria-controls="hub-nav">☰ <span>Меню</span></button>
+    <nav class="hub-nav" id="hub-nav" aria-label="Основная навигация">
+      <a href="../micro_racing_hub/index.html">Заезд</a>
+      <a href="./index.html?hub" aria-current="page">Каталог трасс</a>
+    </nav>
+  </header>
   <main class="shell">
     <header class="masthead">
       <div>
@@ -16,7 +26,7 @@
         <h1>Каталог трасс</h1>
         <p class="subtitle">Панель управления гоночными трассами</p>
       </div>
-      <a class="game-link" href="../retro_cars_widget/index.html">Стандартная трасса <span aria-hidden="true">↗</span></a>
+      <a id="standard-game" class="game-link" href="../retro_cars_widget/index.html">Стандартная трасса <span aria-hidden="true">↗</span></a>
     </header>
 
     <section class="panel" aria-labelledby="add-title">
@@ -94,5 +104,6 @@
       </div>
     </section>
   </main>
+  <footer class="hub-footer" hidden><span>RETRO MICRO CARS</span><span>Инерционный дрифт · Вариант 21</span></footer>
 </body>
 </html>

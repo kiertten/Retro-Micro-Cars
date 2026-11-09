@@ -1,15 +1,8 @@
 import { FPS, RACE_STATE, STEP_SECONDS, TOTAL_LAPS } from '../../retro_cars_js/js/constants.js';
-import { Race } from '../../retro_cars_js/js/race.js';
-import { Track } from '../../retro_cars_js/js/track.js';
 import { loadTracks } from '../../retro_cars_crud/js/tracks.js';
 import { CatalogTrack } from './catalog-track.js';
-import { createInput } from './input.js';
-import { createRenderer } from './renderer.js';
-import { createScenarios } from './scenarios.js';
-import { SkidMarks } from './skid-marks.js';
+import { loadDefaultTrack, mountRace } from './race-widget.js';
 
-const STEP_MS = STEP_SECONDS * 1000;
-const MAX_DELTA_MS = 100;
 const byId = (id) => document.getElementById(id);
 
 function writeText(node, value) {
@@ -76,62 +69,17 @@ async function loadTrack() {
     writeText(byId('track-details'), record.length + ' м · чекпоинтов ' + record.checkpoints);
     return new CatalogTrack(record);
   }
-  const response = await fetch(new URL('../../retro_cars_js/track.json', import.meta.url));
-  if (!response.ok) throw new Error('Не удалось загрузить карту трассы (' + response.status + ')');
-  return Track.fromJSON(await response.text());
+  return loadDefaultTrack();
 }
 
 async function boot() {
   const track = await loadTrack();
-  const race = new Race(track);
-  let accumulator = 0;
-  let lastTime = null;
-
-  const widget = {
-    race,
-    skids: new SkidMarks(),
-    paused: false,
-    limitedVisibility: false,
-    resetClock() {
-      accumulator = 0;
-      lastTime = null;
-    },
-    resetRace() {
-      this.race.reset();
-      this.skids.clear();
-      this.input.clear();
-      this.paused = false;
-      this.resetClock();
-    },
-  };
-  const render = createRenderer(byId('track'), track);
-  const updateHud = createHud();
-  const scenarios = createScenarios(widget);
-  widget.input = createInput(scenarios);
-
-  for (const button of document.querySelectorAll('[data-scenario]')) {
-    button.disabled = false;
-    button.addEventListener('click', () => scenarios[button.dataset.scenario]());
-  }
-  document.addEventListener('visibilitychange', () => widget.resetClock());
+  const { widget, scenarios } = mountRace(byId('track'), {
+    track,
+    updateHud: createHud(),
+    controls: document.querySelectorAll('[data-scenario]'),
+  });
   window.RetroMicroCars = Object.freeze({ widget, scenarios });
-
-  function loop(now) {
-    const delta = lastTime === null ? 0 : Math.min(now - lastTime, MAX_DELTA_MS);
-    lastTime = now;
-    if (race.state === RACE_STATE.RUNNING && !widget.paused) {
-      accumulator += delta;
-      while (accumulator >= STEP_MS && race.state === RACE_STATE.RUNNING) {
-        race.update(widget.input.read());
-        widget.skids.update(race.car, track, race.frame);
-        accumulator -= STEP_MS;
-      }
-    }
-    render(widget);
-    updateHud(widget);
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
 }
 
 boot().catch((error) => {
