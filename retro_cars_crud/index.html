@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Каталог трасс · Retro Micro Cars</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./css/style.css">
+  <script type="module" src="./js/crud.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow"><span class="flag" aria-hidden="true"></span> RETRO MICRO CARS</p>
+        <h1>Каталог трасс</h1>
+        <p class="subtitle">Панель управления гоночными трассами</p>
+      </div>
+      <a class="game-link" href="../retro_cars_widget/index.html">Стандартная трасса <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <section class="panel" aria-labelledby="add-title">
+      <div class="panel-title">
+        <p class="eyebrow">01 / НОВАЯ ЗАПИСЬ</p>
+        <h2 id="add-title">Добавить трассу</h2>
+      </div>
+      <form id="create-track" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="create-name">Название</label>
+            <input id="create-name" name="name" required maxlength="80" placeholder="Северное кольцо"
+              aria-describedby="create-name-error">
+            <span id="create-name-error" class="error" data-error="name"></span>
+          </div>
+          <div class="field">
+            <label for="create-length">Длина, м</label>
+            <input id="create-length" name="length" type="number" min="0.01" max="100000"
+              step="any" required placeholder="1200" aria-describedby="create-length-error">
+            <span id="create-length-error" class="error" data-error="length"></span>
+          </div>
+          <div class="field">
+            <label for="create-checkpoints">Чекпоинты</label>
+            <input id="create-checkpoints" name="checkpoints" type="number" min="0" max="100"
+              step="1" required placeholder="4" aria-describedby="create-checkpoints-error">
+            <span id="create-checkpoints-error" class="error" data-error="checkpoints"></span>
+          </div>
+          <div class="field corners-field">
+            <label for="create-corners">Координаты углов</label>
+            <textarea id="create-corners" name="corners" rows="2" required maxlength="4000"
+              placeholder="[[80, 80], [720, 80], [720, 520], [80, 520]]"
+              aria-describedby="corners-help create-corners-error"></textarea>
+            <span id="corners-help" class="help">Массив JSON из 3–100 пар [x, y]. Поле 800 × 600 пикселей.</span>
+            <span id="create-corners-error" class="error" data-error="corners"></span>
+          </div>
+        </div>
+        <button class="primary" type="submit">Добавить трассу</button>
+      </form>
+    </section>
+
+    <p id="notice" class="notice" role="status" aria-live="polite"></p>
+
+    <section class="panel catalog" aria-labelledby="catalog-title">
+      <div class="catalog-header">
+        <div class="panel-title">
+          <p class="eyebrow">02 / КАТАЛОГ</p>
+          <h2 id="catalog-title">Трассы</h2>
+        </div>
+        <span id="count" class="badge">Показано 0 из 0</span>
+      </div>
+      <div class="filters">
+        <div class="field">
+          <label for="search">Поиск по названию</label>
+          <input id="search" type="search" placeholder="Введите название">
+        </div>
+        <div class="field">
+          <label for="max-length">Макс. длина, м</label>
+          <input id="max-length" type="number" min="0" step="any" placeholder="Любая">
+        </div>
+      </div>
+      <form id="edit-track" novalidate></form>
+      <div class="table-scroll" role="region" aria-label="Таблица трасс" tabindex="0">
+        <table id="tracks" aria-labelledby="catalog-title">
+          <thead>
+            <tr>
+              <th scope="col">Название</th>
+              <th scope="col">Длина, м</th>
+              <th scope="col">Чекпоинты</th>
+              <th scope="col">Координаты углов</th>
+              <th scope="col">Действия</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

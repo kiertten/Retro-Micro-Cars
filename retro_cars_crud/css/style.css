@@ -1,0 +1,75 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, sans-serif;
+  color: #f1f3f1;
+  background: #0e1318;
+  --panel: #171e25;
+  --field: #11171d;
+  --line: #35424d;
+  --muted: #b4c0cb;
+  --accent: #f5c75d;
+  --error: #ff9c94;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+.shell { width: min(1160px, calc(100% - 40px)); margin: 38px auto; }
+.masthead, .catalog-header { display: flex; align-items: end; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.masthead { margin-bottom: 24px; }
+.eyebrow { margin: 0; color: var(--accent); font: 700 12px/1.4 ui-monospace, monospace; letter-spacing: .12em; }
+.flag { display: inline-block; width: 12px; height: 12px; margin-right: 4px; vertical-align: -.1em; background: repeating-conic-gradient(#e9ecdf 0% 25%, #33404a 0% 50%) 0 0 / 8px 8px; }
+h1 { margin: 5px 0; font-size: clamp(32px, 6vw, 52px); line-height: 1.05; letter-spacing: -.04em; }
+h2 { margin: 4px 0 0; font-size: 22px; }
+.subtitle, .help { color: var(--muted); }
+.subtitle { margin: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.panel-title { margin-bottom: 14px; }
+.form-grid, .filters { display: grid; gap: 12px; }
+.form-grid { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); margin-bottom: 14px; }
+.corners-field { grid-column: 1 / -1; }
+.filters { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); margin-bottom: 14px; }
+.field { display: grid; gap: 5px; align-content: start; min-width: 0; }
+label, th { font-size: 13px; font-weight: 650; color: var(--muted); }
+input, textarea, button, .game-link { font: inherit; font-size: 14px; border: 1px solid var(--line); border-radius: 6px; }
+input, textarea { width: 100%; min-width: 0; color: inherit; background: var(--field); padding: 9px 10px; }
+textarea, code, .badge { font-family: ui-monospace, monospace; }
+textarea { resize: vertical; }
+input::placeholder, textarea::placeholder { color: #8998a5; }
+.help, .error { font-size: 12px; }
+.error { display: block; color: var(--error); }
+.error:empty, .notice:empty { display: none; }
+[aria-invalid="true"] { border-color: var(--error); }
+
+button, .game-link { min-height: 36px; padding: 7px 12px; color: inherit; background: #26323d; cursor: pointer; text-decoration: none; }
+button:hover, .game-link:hover { border-color: var(--accent); }
+button.primary { color: #1e170a; background: var(--accent); border-color: var(--accent); font-weight: 720; }
+button.primary:hover { background: #ffda83; }
+button.danger { color: var(--error); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.notice { padding: 10px 14px; background: #192b24; border: 1px solid #3b6955; border-radius: 8px; }
+.notice[data-error="true"] { color: var(--error); background: #312225; border-color: #6f4342; }
+.catalog { margin-top: 16px; }
+.badge { margin-bottom: 14px; color: var(--accent); font-size: 12px; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { width: 100%; min-width: 790px; border-collapse: collapse; table-layout: fixed; }
+th, td { padding: 10px; text-align: left; vertical-align: top; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); }
+th { background: var(--field); }
+th:nth-child(1) { width: 19%; }
+th:nth-child(2), th:nth-child(3) { width: 12%; }
+th:nth-child(4) { width: 34%; }
+th:nth-child(5) { width: 23%; }
+tr:last-child td { border-bottom: 0; }
+td { font-size: 14px; }
+td code { color: #c5d3de; font-size: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.actions button, .actions a { padding-inline: 8px; font-size: 12px; }
+.actions a { display: inline-flex; align-items: center; color: var(--accent); }
+.editing { background: #202a32; }
+.empty { color: var(--muted); padding: 20px 10px; text-align: center; }
+
+@media (max-width: 620px) {
+  .shell { width: calc(100% - 24px); margin: 20px auto; }
+  .panel { padding: 14px; }
+  .form-grid, .filters { grid-template-columns: 1fr 1fr; }
+  .form-grid .field:first-child, .filters .field:first-child { grid-column: 1 / -1; }
+}

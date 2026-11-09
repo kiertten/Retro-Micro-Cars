@@ -15,11 +15,47 @@ function checker(ctx, x, y) {
   }
 }
 
+function drawCatalogTrack(ctx, track) {
+  ctx.fillStyle = '#365b47';
+  ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+  ctx.beginPath();
+  for (const [index, { x, y }] of track.corners.entries()) {
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#e4e0d3';
+  ctx.lineWidth = track.roadWidth + 4;
+  ctx.stroke();
+  ctx.strokeStyle = '#87929a';
+  ctx.lineWidth = track.roadWidth;
+  ctx.stroke();
+
+  const gates = [...track.checkpoints, track.finish];
+  for (const gate of gates) {
+    const half = track.roadWidth / 2;
+    const isFinish = gate === track.finish;
+    ctx.setLineDash(isFinish ? [] : [5, 5]);
+    ctx.strokeStyle = isFinish ? '#f5f1e6' : '#ffdf7e';
+    ctx.lineWidth = isFinish ? 5 : 2;
+    ctx.beginPath();
+    ctx.moveTo(gate.x - gate.dy * half, gate.y + gate.dx * half);
+    ctx.lineTo(gate.x + gate.dy * half, gate.y - gate.dx * half);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
 function buildTrack(track) {
   const canvas = document.createElement('canvas');
   canvas.width = WINDOW_WIDTH;
   canvas.height = WINDOW_HEIGHT;
   const ctx = canvas.getContext('2d');
+  if (track.finish) {
+    drawCatalogTrack(ctx, track);
+    return canvas;
+  }
 
   track.tiles.forEach((row, rowIndex) => {
     [...row].forEach((tile, colIndex) => {

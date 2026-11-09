@@ -1,6 +1,8 @@
 import { FPS, RACE_STATE, STEP_SECONDS, TOTAL_LAPS } from '../../retro_cars_js/js/constants.js';
 import { Race } from '../../retro_cars_js/js/race.js';
 import { Track } from '../../retro_cars_js/js/track.js';
+import { loadTracks } from '../../retro_cars_crud/js/tracks.js';
+import { CatalogTrack } from './catalog-track.js';
 import { createInput } from './input.js';
 import { createRenderer } from './renderer.js';
 import { createScenarios } from './scenarios.js';
@@ -34,9 +36,18 @@ function createHud() {
     const elapsed = timed ? (frame - startFrame) * STEP_SECONDS : 0;
     const title = paused ? 'Пауза' : finished ? 'Заезд завершён'
       : running ? timed ? 'Заезд идёт' : 'Разгон к старту' : 'Готов к старту';
-    const hint = finished ? 'Три круга зачтены. Итоговое время указано ниже.'
-      : running && !timed ? 'Пересеките клетчатую линию вправо, чтобы запустить отсчёт.'
+    let hint;
+    if (finished) {
+      hint = 'Три круга зачтены. Итоговое время указано ниже.';
+    } else if (race.track.finish) {
+      hint = timed
+        ? 'Чекпоинты за круг ' + race.nextCheckpoint + ' / ' + race.track.checkpoints.length
+        : 'Пересеките белую линию по ходу движения, чтобы запустить отсчёт.';
+    } else {
+      hint = running && !timed
+        ? 'Пересеките клетчатую линию вправо, чтобы запустить отсчёт.'
         : 'Пройдите нижнюю часть трассы и пересеките финиш вправо.';
+    }
 
     writeText(nodes['race-status'], title);
     writeText(nodes['race-hint'], hint);
@@ -56,10 +67,22 @@ function createHud() {
   };
 }
 
-async function boot() {
+async function loadTrack() {
+  const id = new URLSearchParams(window.location.search).get('track');
+  if (id !== null) {
+    const record = loadTracks().find((track) => track.id === id);
+    if (!record) throw new Error('Трасса не найдена. Выберите её в каталоге');
+    writeText(byId('track-name'), record.name);
+    writeText(byId('track-details'), record.length + ' м · чекпоинтов ' + record.checkpoints);
+    return new CatalogTrack(record);
+  }
   const response = await fetch(new URL('../../retro_cars_js/track.json', import.meta.url));
   if (!response.ok) throw new Error('Не удалось загрузить карту трассы (' + response.status + ')');
-  const track = Track.fromJSON(await response.text());
+  return Track.fromJSON(await response.text());
+}
+
+async function boot() {
+  const track = await loadTrack();
   const race = new Race(track);
   let accumulator = 0;
   let lastTime = null;
@@ -113,6 +136,6 @@ async function boot() {
 
 boot().catch((error) => {
   writeText(byId('race-status'), 'Ошибка загрузки');
-  writeText(byId('race-hint'), error.message + '. Запустите сервер из корня проекта.');
+  writeText(byId('race-hint'), error.message + '.');
   console.error(error);
 });
